@@ -1,145 +1,422 @@
+### Executive Overview
+This report provides a comprehensive data dictionary and glossary for the International Baccalaureate (IB) School Data Vault 2.0 model, as defined in `IB_datavault2.sql`. The data model consists of 29 tables, classified as Hubs, Links, Satellites, a Reference table, and a Business Vault table. All table and column definitions have been extracted directly from the DDL. Business descriptions are derived from DDL comments; where no comments were present, definitions are marked as requiring business input. The analysis also identifies 30 foreign key relationships and a significant documentation gap: the absence of a foreign key constraint between `SatAttendanceDetails` and the `RefAttendanceStatus` table it logically references. Data profiling checks have been documented based on the `IB_DataVault_Data_Profiling_Plan.xlsx` plan, but no actual data profiling has been executed, so all checks are marked as `NOT_RUN`.
 
-# Glossary Builder Output
+### Table Inventory
+| Schema | Table Name | Table Type | Business Description |
+|---|---|---|---|
+| Ib | HubStudent | Hub | Business definition required |
+| Ib | HubTeacher | Hub | Business definition required |
+| Ib | HubCourse | Hub | Business definition required |
+| Ib | HubCourseSection | Hub | Business definition required |
+| Ib | HubSchool | Hub | Business definition required |
+| Ib | HubAcademicTerm | Hub | Business definition required |
+| Ib | HubProgramme | Hub | Business definition required |
+| Ib | HubAssessment | Hub | Business definition required |
+| Ib | LnkSectionOffering | Link | A section is one course offered in one term at one school |
+| Ib | LnkSectionTeacher | Link | Teacher assigned to a section, by role (PRIMARY, CO-TEACHER, SUBSTITUTE) |
+| Ib | LnkStudentProgramme | Link | Student in an IB programme at a school |
+| Ib | LnkEnrollment | Link | Student enrolled in a section |
+| Ib | LnkAttendance | Link | Attendance event: student + section + date + period (period is a dependent child key) |
+| Ib | LnkAssessmentResult | Link | Student result for an assessment in a section |
+| Ib | SatStudentPersonal | Satellite | Student PII split from academic attributes |
+| Ib | SatStudentAcademic | Satellite | Business definition required |
+| Ib | SatTeacherDetails | Satellite | Business definition required |
+| Ib | SatCourseDetails | Satellite | Business definition required |
+| Ib | SatCourseSectionDetails | Satellite | Business definition required |
+| Ib | SatSchoolDetails | Satellite | Business definition required |
+| Ib | SatAcademicTermDetails | Satellite | Business definition required |
+| Ib | SatProgrammeDetails | Satellite | Business definition required |
+| Ib | SatAssessmentDetails | Satellite | Business definition required |
+| Ib | SatEnrollmentDetails | Satellite | Link satellite |
+| Ib | SatStudentProgrammeDetails | Satellite | Business definition required |
+| Ib | SatAttendanceDetails | Satellite | Business definition required |
+| Ib | SatAssessmentResult | Satellite | Business definition required |
+| Ib | RefAttendanceStatus | Reference | Business definition required |
+| Ib | BvSatAttendanceSummary | Business Vault | Business Vault: attendance summary per enrollment (computed satellite) |
 
-## Executive Overview
+### Column Data Dictionary
+**Table: HubStudent** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| StudentHk | Business definition required | binary(32) | PK | |
+| StudentBk | school student ID | varchar(50) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-This document provides a comprehensive data glossary and dictionary for the IB (International Baccalaureate) Data Vault. It includes detailed information on all tables, columns, relationships, and data profiling results, generated from the `IB_datavault2.sql` DDL file and the `IB_DataVault_Data_Profiling_Plan.xlsx` data profiling plan.
+**Table: HubTeacher** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| TeacherHk | Business definition required | binary(32) | PK | |
+| TeacherBk | staff ID | varchar(50) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-## Table Inventory
+**Table: HubCourse** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| CourseHk | Business definition required | binary(32) | PK | |
+| CourseBk | e.g. MATH-AA-HL | varchar(50) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-| Schema | Table Name                  | Table Type       | Business Description                                               |
-|--------|-----------------------------|------------------|--------------------------------------------------------------------|
-| Ib     | HubStudent                  | Hub              | Represents a unique student.                                       |
-| Ib     | HubTeacher                  | Hub              | Represents a unique teacher.                                       |
-| Ib     | HubCourse                   | Hub              | Represents a unique course.                                        |
-| Ib     | HubCourseSection            | Hub              | Represents a unique section of a course.                           |
-| Ib     | HubSchool                   | Hub              | Represents a unique school.                                        |
-| Ib     | HubAcademicTerm             | Hub              | Represents a unique academic term.                                 |
-| Ib     | HubProgramme                | Hub              | Represents a unique IB programme.                                  |
-| Ib     | HubAssessment               | Hub              | Represents a unique assessment.                                    |
-| Ib     | LnkSectionOffering          | Link             | Associates a course section with a course, academic term, and school. |
-| Ib     | LnkSectionTeacher           | Link             | Assigns a teacher to a course section with a specific role.        |
-| Ib     | LnkStudentProgramme         | Link             | Associates a student with an IB programme at a school.             |
-| Ib     | LnkEnrollment               | Link             | Enrolls a student in a course section.                             |
-| Ib     | LnkAttendance               | Link             | Records a student's attendance for a course section on a given date. |
-| Ib     | LnkAssessmentResult         | Link             | Stores the result of an assessment for a student in a course section.|
-| Ib     | SatStudentPersonal          | Satellite        | Stores personal (PII) attributes of a student.                     |
-| Ib     | SatStudentAcademic          | Satellite        | Stores academic attributes of a student.                           |
-| Ib     | SatTeacherDetails           | Satellite        | Stores details about a teacher.                                    |
-| Ib     | SatCourseDetails            | Satellite        | Stores details about a course.                                     |
-| Ib     | SatCourseSectionDetails     | Satellite        | Stores details about a course section.                             |
-| Ib     | SatSchoolDetails            | Satellite        | Stores details about a school.                                     |
-| Ib     | SatAcademicTermDetails      | Satellite        | Stores details about an academic term.                             |
-| Ib     | SatProgrammeDetails         | Satellite        | Stores details about an IB programme.                              |
-| Ib     | SatAssessmentDetails        | Satellite        | Stores details about an assessment.                                |
-| Ib     | SatEnrollmentDetails        | Satellite        | Stores details about a student's enrollment in a course section.   |
-| Ib     | SatStudentProgrammeDetails  | Satellite        | Stores details about a student's IB programme.                     |
-| Ib     | SatAttendanceDetails        | Satellite        | Stores details about a student's attendance.                       |
-| Ib     | SatAssessmentResult         | Satellite        | Stores details about a student's assessment result.                |
-| Ib     | RefAttendanceStatus         | Reference        | A reference table for attendance status codes.                     |
-| Ib     | BvSatAttendanceSummary      | Business Vault   | A computed satellite for attendance summary per enrollment.        |
+**Table: HubCourseSection** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| CourseSectionHk | Business definition required | binary(32) | PK | |
+| CourseSectionBk | SchoolCode||TermCode||CourseCode||SectionCode | varchar(120) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-## Column Data Dictionary
+**Table: HubSchool** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| SchoolHk | Business definition required | binary(32) | PK | |
+| SchoolBk | IB school code | varchar(20) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-| Schema | Table Name             | Table Type | Column Name      | Column Description                             | Data Type    | Key Column Flag | Referenced Table Name |
-|--------|------------------------|------------|------------------|------------------------------------------------|--------------|-----------------|-----------------------|
-| Ib     | HubStudent             | Hub        | StudentHk        | Hash key for the student                       | binary(32)   | PK              |                       |
-| Ib     | HubStudent             | Hub        | StudentBk        | Business key for the student (school student ID) | varchar(50)  | BK, UQ          |                       |
-| Ib     | HubStudent             | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubStudent             | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubTeacher             | Hub        | TeacherHk        | Hash key for the teacher                       | binary(32)   | PK              |                       |
-| Ib     | HubTeacher             | Hub        | TeacherBk        | Business key for the teacher (staff ID)        | varchar(50)  | BK, UQ          |                       |
-| Ib     | HubTeacher             | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubTeacher             | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubCourse              | Hub        | CourseHk         | Hash key for the course                        | binary(32)   | PK              |                       |
-| Ib     | HubCourse              | Hub        | CourseBk         | Business key for the course (e.g. MATH-AA-HL)  | varchar(50)  | BK, UQ          |                       |
-| Ib     | HubCourse              | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubCourse              | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubCourseSection       | Hub        | CourseSectionHk  | Hash key for the course section                | binary(32)   | PK              |                       |
-| Ib     | HubCourseSection       | Hub        | CourseSectionBk  | Business key for the course section            | varchar(120) | BK, UQ          |                       |
-| Ib     | HubCourseSection       | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubCourseSection       | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubSchool              | Hub        | SchoolHk         | Hash key for the school                        | binary(32)   | PK              |                       |
-| Ib     | HubSchool              | Hub        | SchoolBk         | Business key for the school (IB school code)   | varchar(20)  | BK, UQ          |                       |
-| Ib     | HubSchool              | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubSchool              | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubAcademicTerm        | Hub        | AcademicTermHk   | Hash key for the academic term                 | binary(32)   | PK              |                       |
-| Ib     | HubAcademicTerm        | Hub        | AcademicTermBk   | Business key for the academic term             | varchar(30)  | BK, UQ          |                       |
-| Ib     | HubAcademicTerm        | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubAcademicTerm        | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubProgramme           | Hub        | ProgrammeHk      | Hash key for the programme                     | binary(32)   | PK              |                       |
-| Ib     | HubProgramme           | Hub        | ProgrammeBk      | Business key for the programme (PYP, MYP, DP, CP) | varchar(10)  | BK, UQ          |                       |
-| Ib     | HubProgramme           | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubProgramme           | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
-| Ib     | HubAssessment          | Hub        | AssessmentHk     | Hash key for the assessment                    | binary(32)   | PK              |                       |
-| Ib     | HubAssessment          | Hub        | AssessmentBk     | Business key for the assessment                | varchar(60)  | BK, UQ          |                       |
-| Ib     | HubAssessment          | Hub        | LoadDts          | Load timestamp                                 | datetime2(7) | Metadata        |                       |
-| Ib     | HubAssessment          | Hub        | RecordSource     | Source of the record                             | varchar(100) | Metadata        |                       |
+**Table: HubAcademicTerm** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AcademicTermHk | Business definition required | binary(32) | PK | |
+| AcademicTermBk | e.g. 2025-FALL | varchar(30) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-## Relationship Inventory
+**Table: HubProgramme** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| ProgrammeHk | Business definition required | binary(32) | PK | |
+| ProgrammeBk | PYP, MYP, DP, CP | varchar(10) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-| Table Name             | Column Name       | Relationship Type | Referenced Table Name | Referenced Column Name |
-|------------------------|-------------------|-------------------|-----------------------|------------------------|
-| LnkSectionOffering     | CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| LnkSectionOffering     | CourseHk          | FOREIGN KEY       | HubCourse             | CourseHk               |
-| LnkSectionOffering     | AcademicTermHk    | FOREIGN KEY       | HubAcademicTerm       | AcademicTermHk         |
-| LnkSectionOffering     | SchoolHk          | FOREIGN KEY       | HubSchool             | SchoolHk               |
-| LnkSectionTeacher      | CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| LnkSectionTeacher      | TeacherHk         | FOREIGN KEY       | HubTeacher            | TeacherHk              |
-| LnkStudentProgramme    | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| LnkStudentProgramme    | ProgrammeHk       | FOREIGN KEY       | HubProgramme          | ProgrammeHk            |
-| LnkStudentProgramme    | SchoolHk          | FOREIGN KEY       | HubSchool             | SchoolHk               |
-| LnkEnrollment          | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| LnkEnrollment          | CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| LnkAttendance          | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| LnkAttendance          | CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| LnkAssessmentResult    | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| LnkAssessmentResult    | AssessmentHk      | FOREIGN KEY       | HubAssessment         | AssessmentHk           |
-| LnkAssessmentResult    | CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| SatStudentPersonal     | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| SatStudentAcademic     | StudentHk         | FOREIGN KEY       | HubStudent            | StudentHk              |
-| SatTeacherDetails      | TeacherHk         | FOREIGN KEY       | HubTeacher            | TeacherHk              |
-| SatCourseDetails       | CourseHk          | FOREIGN KEY       | HubCourse             | CourseHk               |
-| SatCourseSectionDetails| CourseSectionHk   | FOREIGN KEY       | HubCourseSection      | CourseSectionHk        |
-| SatSchoolDetails       | SchoolHk          | FOREIGN KEY       | HubSchool             | SchoolHk               |
-| SatAcademicTermDetails | AcademicTermHk    | FOREIGN KEY       | HubAcademicTerm       | AcademicTermHk         |
-| SatProgrammeDetails    | ProgrammeHk       | FOREIGN KEY       | HubProgramme          | ProgrammeHk            |
-| SatAssessmentDetails   | AssessmentHk      | FOREIGN KEY       | HubAssessment         | AssessmentHk           |
-| SatEnrollmentDetails   | EnrollmentHk      | FOREIGN KEY       | LnkEnrollment         | EnrollmentHk           |
-| SatStudentProgrammeDetails| StudentProgrammeHk| FOREIGN KEY       | LnkStudentProgramme   | StudentProgrammeHk     |
-| SatAttendanceDetails   | AttendanceHk      | FOREIGN KEY       | LnkAttendance         | AttendanceHk           |
-| SatAssessmentResult    | AssessmentResultHk| FOREIGN KEY       | LnkAssessmentResult   | AssessmentResultHk     |
-| BvSatAttendanceSummary | EnrollmentHk      | FOREIGN KEY       | LnkEnrollment         | EnrollmentHk           |
+**Table: HubAssessment** (Hub)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AssessmentHk | Business definition required | binary(32) | PK | |
+| AssessmentBk | e.g. MATH-AA-HL-IA, EE, TOK-ESSAY, CAS | varchar(60) | BK | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-## Documentation Gaps
+**Table: LnkSectionOffering** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| SectionOfferingHk | Business definition required | binary(32) | PK | |
+| CourseSectionHk | Business definition required | binary(32) | FK | HubCourseSection |
+| CourseHk | Business definition required | binary(32) | FK | HubCourse |
+| AcademicTermHk | Business definition required | binary(32) | FK | HubAcademicTerm |
+| SchoolHk | Business definition required | binary(32) | FK | HubSchool |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-| Table Name                  | Column Name         | Gap Type                       | Description                                | Recommended Clarification                                    |
-|-----------------------------|---------------------|--------------------------------|--------------------------------------------|--------------------------------------------------------------|
-| SatStudentPersonal          | Gender              | Unclear Terminology            | `char(1)` data type is not descriptive.    | Use a more descriptive data type or add a check constraint.  |
-| SatStudentPersonal          | Nationality         | Unclear Terminology            | `varchar(2)` data type.                    | Specify the standard used (e.g., ISO 3166-1 alpha-2).        |
-| SatStudentAcademic          | GradeLevel          | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatTeacherDetails           | IbWorkshopCertified | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatCourseDetails            | SubjectGroup        | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatCourseSectionDetails     | SectionStatus       | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatSchoolDetails            | AuthorizedProgrammes| Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatEnrollmentDetails        | EnrollmentStatus    | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatStudentProgrammeDetails  | CandidateType       | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatStudentProgrammeDetails  | ProgrammeStatus     | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatAttendanceDetails        | AttendanceStatusCode| Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
-| SatAssessmentResult         | ResultType          | Missing Business Definition    | No business definition provided.           | Provide a clear business definition for this column.         |
+**Table: LnkSectionTeacher** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| SectionTeacherHk | Business definition required | binary(32) | PK | |
+| CourseSectionHk | Business definition required | binary(32) | FK | HubCourseSection |
+| TeacherHk | Business definition required | binary(32) | FK | HubTeacher |
+| TeacherRole | Business definition required | varchar(20) | | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-## Data Profiling Summary
+**Table: LnkStudentProgramme** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| StudentProgrammeHk | Business definition required | binary(32) | PK | |
+| StudentHk | Business definition required | binary(32) | FK | HubStudent |
+| ProgrammeHk | Business definition required | binary(32) | FK | HubProgramme |
+| SchoolHk | Business definition required | binary(32) | FK | HubSchool |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-The following is a summary of the data profiling checks from the `IB_DataVault_Data_Profiling_Plan.xlsx` file.
+**Table: LnkEnrollment** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| EnrollmentHk | Business definition required | binary(32) | PK | |
+| StudentHk | Business definition required | binary(32) | FK | HubStudent |
+| CourseSectionHk | Business definition required | binary(32) | FK | HubCourseSection |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
-| Table Name   | Column Name | Profiling Check | Result      | Count | Percentage | Status  |
-|--------------|-------------|-----------------|-------------|-------|------------|---------|
-| HubStudent   | StudentBk   | Uniqueness      | Not executed|       |            | Planned |
-| HubStudent   | StudentBk   | Not Null        | Not executed|       |            | Planned |
-| HubTeacher   | TeacherBk   | Uniqueness      | Not executed|       |            | Planned |
-| HubTeacher   | TeacherBk   | Not Null        | Not executed|       |            | Planned |
-| HubCourse    | CourseBk    | Uniqueness      | Not executed|       |            | Planned |
-| HubCourse    | CourseBk    | Not Null        | Not executed|       |            | Planned |
-| HubSchool    | SchoolBk    | Uniqueness      | Not executed|       |            | Planned |
-| HubSchool    | SchoolBk    | Not Null        | Not executed|       |            | Planned |
+**Table: LnkAttendance** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AttendanceHk | Business definition required | binary(32) | PK | |
+| StudentHk | Business definition required | binary(32) | FK | HubStudent |
+| CourseSectionHk | Business definition required | binary(32) | FK | HubCourseSection |
+| AttendanceDate | Business definition required | date | | |
+| PeriodNumber | Business definition required | tinyint | | |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
 
+**Table: LnkAssessmentResult** (Link)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AssessmentResultHk | Business definition required | binary(32) | PK | |
+| StudentHk | Business definition required | binary(32) | FK | HubStudent |
+| AssessmentHk | Business definition required | binary(32) | FK | HubAssessment |
+| CourseSectionHk | Business definition required | binary(32) | FK | HubCourseSection |
+| LoadDts | Business definition required | datetime2(7) | Metadata | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatStudentPersonal** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| StudentHk | Business definition required | binary(32) | PK, FK | HubStudent |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| FirstName | Business definition required | varchar(100) | | |
+| MiddleName | Business definition required | varchar(100) | | |
+| LastName | Business definition required | varchar(100) | | |
+| PreferredName | Business definition required | varchar(100) | | |
+| BirthDate | Business definition required | date | | |
+| Gender | Business definition required | char(1) | | |
+| Nationality | ISO 3166-1 alpha-2 | varchar(2) | | |
+| NativeLanguage | Business definition required | varchar(50) | | |
+| Email | Business definition required | varchar(255) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatStudentAcademic** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| StudentHk | Business definition required | binary(32) | PK, FK | HubStudent |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| GradeLevel | e.g. Grade 11 / Year 12 | varchar(10) | | |
+| IbCandidateCode | IB candidate (personal) code | varchar(20) | | |
+| EnrollmentStatus | Active, Withdrawn, Graduated | varchar(20) | | |
+| AdmissionDate | Business definition required | date | | |
+| HouseOrHomeroom | Business definition required | varchar(30) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatTeacherDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| TeacherHk | Business definition required | binary(32) | PK, FK | HubTeacher |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| FirstName | Business definition required | varchar(100) | | |
+| LastName | Business definition required | varchar(100) | | |
+| Email | Business definition required | varchar(255) | | |
+| Department | Business definition required | varchar(100) | | |
+| IbWorkshopCertified | Business definition required | bit | | |
+| IsActive | Business definition required | bit | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatCourseDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| CourseHk | Business definition required | binary(32) | PK, FK | HubCourse |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| CourseName | Business definition required | varchar(200) | | |
+| ProgrammeCode | PYP, MYP, DP, CP | varchar(10) | | |
+| SubjectGroup | DP groups 1-6 | tinyint | | |
+| SubjectArea | Business definition required | varchar(100) | | |
+| CourseLevel | HL, SL, Standard | varchar(10) | | |
+| LanguageOfInstruction | Business definition required | varchar(50) | | |
+| TeachingHours | 240 HL / 150 SL | smallint | | |
+| IsCore | TOK, EE, CAS | bit | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatCourseSectionDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| CourseSectionHk | Business definition required | binary(32) | PK, FK | HubCourseSection |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| SectionCode | Business definition required | varchar(20) | | |
+| Room | Business definition required | varchar(30) | | |
+| SchedulePeriod | Business definition required | varchar(30) | | |
+| Capacity | Business definition required | smallint | | |
+| SectionStatus | Business definition required | varchar(20) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatSchoolDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| SchoolHk | Business definition required | binary(32) | PK, FK | HubSchool |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| SchoolName | Business definition required | varchar(200) | | |
+| CountryCode | Business definition required | varchar(2) | | |
+| City | Business definition required | varchar(100) | | |
+| TimeZone | Business definition required | varchar(50) | | |
+| AuthorizedProgrammes | e.g. PYP,MYP,DP | varchar(50) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatAcademicTermDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AcademicTermHk | Business definition required | binary(32) | PK, FK | HubAcademicTerm |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| TermName | Business definition required | varchar(50) | | |
+| AcademicYear | 2025-2026 | varchar(9) | | |
+| StartDate | Business definition required | date | | |
+| EndDate | Business definition required | date | | |
+| InstructionalDays | Business definition required | smallint | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatProgrammeDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| ProgrammeHk | Business definition required | binary(32) | PK, FK | HubProgramme |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| ProgrammeName | Business definition required | varchar(100) | | |
+| AgeRange | 3-12, 11-16, 16-19 | varchar(20) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatAssessmentDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AssessmentHk | Business definition required | binary(32) | PK, FK | HubAssessment |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| AssessmentName | Business definition required | varchar(200) | | |
+| AssessmentType | IA, EE, TOK, CAS, EXAM, INTERNAL | varchar(20) | | |
+| IsInternal | Business definition required | bit | | |
+| MaxScore | Business definition required | decimal(8,2) | | |
+| WeightPercent | Business definition required | decimal(5,2) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatEnrollmentDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| EnrollmentHk | Business definition required | binary(32) | PK, FK | LnkEnrollment |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| EnrollmentStatus | Enrolled, Dropped, Completed | varchar(20) | | |
+| CourseLevel | HL / SL chosen by the student | varchar(10) | | |
+| EnrollDate | Business definition required | date | | |
+| DropDate | Business definition required | date | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatStudentProgrammeDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| StudentProgrammeHk | Business definition required | binary(32) | PK, FK | LnkStudentProgramme |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| CandidateType | Diploma, Course candidate | varchar(30) | | |
+| StartDate | Business definition required | date | | |
+| ExpectedGraduationDate | Business definition required | date | | |
+| ProgrammeStatus | Business definition required | varchar(20) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatAttendanceDetails** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AttendanceHk | Business definition required | binary(32) | PK, FK | LnkAttendance |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| AttendanceStatusCode | P, A, L, E (see RefAttendanceStatus) | varchar(10) | | |
+| MinutesLate | Business definition required | smallint | | |
+| AbsenceReason | Business definition required | varchar(200) | | |
+| RecordedBy | Business definition required | varchar(100) | | |
+| RecordedDts | Business definition required | datetime2(7) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: SatAssessmentResult** (Satellite)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AssessmentResultHk | Business definition required | binary(32) | PK, FK | LnkAssessmentResult |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| HashDiff | Business definition required | binary(32) | Metadata | |
+| RawScore | Business definition required | decimal(8,2) | | |
+| IbGrade | 1-7 | tinyint | | |
+| PredictedGrade | 1-7 | tinyint | | |
+| ResultType | Predicted, Internal, Moderated, Final | varchar(20) | | |
+| AssessedDate | Business definition required | date | | |
+| AssessedBy | Business definition required | varchar(100) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+**Table: RefAttendanceStatus** (Reference)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| AttendanceStatusCode | Business definition required | varchar(10) | PK | |
+| StatusName | Business definition required | varchar(50) | | |
+| IsPresent | Business definition required | bit | | |
+| IsExcused | Business definition required | bit | | |
+
+**Table: BvSatAttendanceSummary** (Business Vault)
+| Column Name | Column Description | Data Type | Key Column Flag | Referenced Table Name |
+|---|---|---|---|---|
+| EnrollmentHk | Business definition required | binary(32) | PK, FK | LnkEnrollment |
+| LoadDts | Business definition required | datetime2(7) | PK, Metadata | |
+| LoadEndDts | Business definition required | datetime2(7) | Metadata | |
+| DaysPresent | Business definition required | int | | |
+| DaysLate | Business definition required | int | | |
+| DaysAbsentExcused | Business definition required | int | | |
+| DaysAbsentUnexcused | Business definition required | int | | |
+| AttendancePercent | Business definition required | decimal(5,2) | | |
+| RecordSource | Business definition required | varchar(100) | Metadata | |
+
+### Relationship Inventory
+| Table Name | Column Name | Relationship Type | Referenced Table Name | Referenced Column Name |
+|---|---|---|---|---|
+| LnkSectionOffering | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| LnkSectionOffering | CourseHk | FK | HubCourse | CourseHk |
+| LnkSectionOffering | AcademicTermHk | FK | HubAcademicTerm | AcademicTermHk |
+| LnkSectionOffering | SchoolHk | FK | HubSchool | SchoolHk |
+| LnkSectionTeacher | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| LnkSectionTeacher | TeacherHk | FK | HubTeacher | TeacherHk |
+| LnkStudentProgramme | StudentHk | FK | HubStudent | StudentHk |
+| LnkStudentProgramme | ProgrammeHk | FK | HubProgramme | ProgrammeHk |
+| LnkStudentProgramme | SchoolHk | FK | HubSchool | SchoolHk |
+| LnkEnrollment | StudentHk | FK | HubStudent | StudentHk |
+| LnkEnrollment | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| LnkAttendance | StudentHk | FK | HubStudent | StudentHk |
+| LnkAttendance | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| LnkAssessmentResult | StudentHk | FK | HubStudent | StudentHk |
+| LnkAssessmentResult | AssessmentHk | FK | HubAssessment | AssessmentHk |
+| LnkAssessmentResult | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| SatStudentPersonal | StudentHk | FK | HubStudent | StudentHk |
+| SatStudentAcademic | StudentHk | FK | HubStudent | StudentHk |
+| SatTeacherDetails | TeacherHk | FK | HubTeacher | TeacherHk |
+| SatCourseDetails | CourseHk | FK | HubCourse | CourseHk |
+| SatCourseSectionDetails | CourseSectionHk | FK | HubCourseSection | CourseSectionHk |
+| SatSchoolDetails | SchoolHk | FK | HubSchool | SchoolHk |
+| SatAcademicTermDetails | AcademicTermHk | FK | HubAcademicTerm | AcademicTermHk |
+| SatProgrammeDetails | ProgrammeHk | FK | HubProgramme | ProgrammeHk |
+| SatAssessmentDetails | AssessmentHk | FK | HubAssessment | AssessmentHk |
+| SatEnrollmentDetails | EnrollmentHk | FK | LnkEnrollment | EnrollmentHk |
+| SatStudentProgrammeDetails | StudentProgrammeHk | FK | LnkStudentProgramme | StudentProgrammeHk |
+| SatAttendanceDetails | AttendanceHk | FK | LnkAttendance | AttendanceHk |
+| SatAssessmentResult | AssessmentResultHk | FK | LnkAssessmentResult | AssessmentResultHk |
+| BvSatAttendanceSummary | EnrollmentHk | FK | LnkEnrollment | EnrollmentHk |
+
+### Documentation Gaps
+| Table Name | Column Name | Gap Type | Description | Recommended Clarification |
+|---|---|---|---|---|
+| SatAttendanceDetails | AttendanceStatusCode | Missing Relationship | The `AttendanceStatusCode` column logically relates to the `RefAttendanceStatus` table but has no declared foreign key constraint. | Define a foreign key constraint from `SatAttendanceDetails(AttendanceStatusCode)` to `RefAttendanceStatus(AttendanceStatusCode)` to enforce referential integrity. |
+| Multiple | Multiple | Missing Business Definition | Many tables and columns lack formal business descriptions in the DDL comments. | Engage with business subject matter experts to document clear, concise definitions for all tables and columns currently marked 'Business definition required'. |
+| HubCourseSection | CourseSectionBk | Unclear Terminology | The business key format is listed as `SchoolCode||TermCode||CourseCode||SectionCode`, but the specific source for each element is not defined. | Provide a clear definition and source for each component of the composite business key. |
+
+### Data Profiling Summary
+| Table Name | Column Name | Profiling Check | Result | Count | Percentage | Status |
+|---|---|---|---|---|---|---|
+| HubStudent | StudentBk | Uniqueness | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| HubStudent | StudentBk | Nulls | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| SatStudentPersonal | Email | Email Format | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| SatStudentPersonal | Nationality | ISO 3166-1 alpha-2 format | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| SatAttendanceDetails | AttendanceStatusCode | Value Distribution | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| SatAttendanceDetails | AttendanceStatusCode | Referential Integrity vs RefAttendanceStatus | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| RefAttendanceStatus | ALL | Seed Data Verification | Business definition required | 4 | 100% | DDL_REVIEWED |
+| BvSatAttendanceSummary | AttendancePercent | Range Check (0-100) | Business definition required | Business definition required | Business definition required | NOT_RUN |
+| ALL | ALL | All data-dependent checks | Business definition required | Business definition required | Business definition required | NOT_RUN |
