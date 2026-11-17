@@ -1,0 +1,19 @@
+{
+  "workflow": "Agents",
+  "source_inputs": [
+    "Agent1_Vault_Model_Reviewer/Input/IB_datavault_2.txt",
+    "Agent2_Glossary_Builder/Input/IB_Data_Profile_Report.pdf",
+    "Agent2_Glossary_Builder/Input/IB_datavault_2.txt",
+    "Agent3_Canonical_Model_Recommender/Input/Bussiness context.txt",
+    "Agent3_Canonical_Model_Recommender/Input/Glossary_Builder_Output.md",
+    "Agent4_Vault_to_Canonical_Mapper/Input/DI vault model reviewer output.md",
+    "Agent4_Vault_to_Canonical_Mapper/Input/DI-Canonical-Model-Recommender.md",
+    "Agent4_Vault_to_Canonical_Mapper/Input/Glossary_Builder_Output.md",
+    "Agent5_Canonical_To_Fabric_Model/Input/DI-Vault-to-Canonical-Mapper.md",
+    "Agent5_Canonical_To_Fabric_Model/Input/Microsoft Fabric Model Standards.txt"
+  ],
+  "response_ids": [
+    "wfresp_0f22594e900c435400pc5t4Jj5fhQYTnK3qn15LvDPWceipaMq"
+  ],
+  "note": "Returned response text is not necessarily five individual agent outputs."
+}
