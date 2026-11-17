@@ -2,7 +2,7 @@
 
 ## Executive Overview
 
-This document is the glossary and data dictionary for the IB Data Vault (schema `Ib`), which models the International Baccalaureate School Academic Management domain: students, teachers, courses and sections, schools, academic terms, IB programmes, enrollments, attendance and assessments.
+This document is the glossary and data dictionary for the IB Data Vault (schema `Ib`), which models the International Baccalaureate School Academic Management domain: students, teachers, courses and sections, schools, academic terms, IB programmes, enrollments, attendance and assessments. 
 
 Sources used:
 
