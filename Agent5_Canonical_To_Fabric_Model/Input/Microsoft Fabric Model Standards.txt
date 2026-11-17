@@ -1,0 +1,66 @@
+Microsoft Fabric Model Standards
+ Canonical To Fabric Model Agent
+
+### 1. Purpose
+Define the standards for converting the canonical model mapping into Microsoft Fabric-compatible DDL.
+
+### 2. Target Platform
+- Target platform: Microsoft Fabric.
+- Target artifact: SQL DDL for the selected Fabric data store.
+- The specific target (Fabric Warehouse or Lakehouse SQL analytics endpoint) must be confirmed before generating DDL.
+- Follow the syntax supported by the selected target. Do not assume that all SQL Server features are supported.
+
+### 3. Naming Conventions
+- Use the canonical table names and column names supplied by Agent 4.
+- Preserve existing names unless a documented target-platform restriction requires a change.
+- Use consistent naming conventions for tables, columns, and schemas.
+- Do not create new business entities or attributes.
+
+### 4. Data Types
+- Use the canonical data types specified in the Agent 4 mapping output as the starting point.
+- Convert data types only when required for compatibility with the selected Fabric target.
+- Preserve numeric precision and scale where supported.
+- Preserve appropriate string lengths and date/time precision where supported.
+- Do not silently truncate string lengths or reduce numeric precision.
+- Document any required type conversion or unresolved incompatibility.
+
+### 5. Table Definitions
+- Generate a DDL definition for every canonical table supplied by Agent 4.
+- Include every canonical column.
+- Use explicit data types for all columns.
+- Apply `NULL` or `NOT NULL` only when supported by the source mapping or approved business rules.
+- Do not invent default values, identity properties, computed columns, or other column behavior.
+
+### 6. Keys and Relationships
+- Define primary keys only when the mapping or approved model specification identifies them.
+- Define foreign keys and relationships only when supported by the supplied mapping and target-platform capabilities.
+- Do not infer a key solely from a column name.
+- If a required key or relationship is unclear, document it as an unresolved item rather than inventing one.
+
+### 7. Constraints and Platform Compatibility
+- Use only syntax and constraints supported by the selected Fabric target.
+- Do not assume SQL Server DDL is directly compatible with Microsoft Fabric.
+- Where the target has limitations on constraints or enforcement, follow the applicable target-specific documentation and record the limitation.
+- Avoid unsupported SQL Server-specific features.
+
+### 8. Output Requirements
+- Output file: `Output/Canonical_To_Fabric_Model_Output.sql`
+- Output format: executable-style SQL DDL.
+- Include table definitions and supported keys or relationships.
+- Use consistent indentation and formatting.
+- Keep explanations and unresolved implementation notes outside executable SQL statements, or use SQL comments where appropriate.
+- Do not include source-to-target mapping tables or new domain recommendations in the DDL output.
+
+### 9. Quality Checks
+Before finalizing the DDL:
+1. Confirm every canonical table is included.
+2. Confirm every canonical column is included.
+3. Verify data types and precision.
+4. Verify naming and schema conventions.
+5. Check that keys and constraints are supported by the inputs.
+6. Check compatibility with the selected Fabric target.
+7. List unresolved decisions that prevent reliable generation.
+8. Do not claim the DDL has been executed or tested unless actual validation evidence is available.
+
+### 10. Missing Information
+If the Fabric target, schema conventions, data type requirements, or constraint requirements are not supplied, ask for clarification or clearly identify the assumption. Do not fabricate organization-specific standards.
