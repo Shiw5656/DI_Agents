@@ -1,0 +1,9 @@
+The Data Vault model represents an academic management system that manages educational institutions' core business processes, including student enrollment, academic programmes, courses, course sections, attendance, and assessments.
+ 
+The system maintains information about students, their enrolments in academic programmes and courses, course offerings, attendance records, assessment activities, and related academic reference data. It supports the management and tracking of academic activities and their associated relationships over time.
+ 
+Use this business context together with the Glossary Builder output to identify the relevant data domains and the business entities to consider in the canonical data model.
+ 
+Determine domain and entity boundaries based on the business meaning of the supplied glossary and the business processes described above. Group related concepts into appropriate data domains, provide a clear description for each domain, and list the relevant entities with a concise description of each.
+ 
+Do not assume that every Data Vault table represents a separate canonical entity. Do not invent domains or entities unsupported by the available inputs. Treat the output as a recommendation of data domains and entities to consider, rather than a finalized canonical model.
