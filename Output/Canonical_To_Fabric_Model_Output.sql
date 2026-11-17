@@ -1,22 +1,56 @@
-ERROR: Missing required input(s): Fabric model standards.
-
-Validation Report:
-- Vault-to-Canonical Mapper output: NOT AVAILABLE as a canonical mapping document. The available input is a Data Vault DDL file (`IB_datavault 2.sql`), not Agent 4 canonical mapping output.
-- Fabric model standards: NOT AVAILABLE.
-
-Assessment:
-- Required canonical mapping input is missing.
-- Required Fabric standards input is missing.
-- Per instructions, processing is halted and no synthetic canonical-to-Fabric DDL has been generated.
-
-Available Source Reviewed:
-- /app/e3a0720a-e7d7-4a26-944e-a7eff5d4fcab/all-files/IB_datavault 2.sql
-
-Reason for Halt:
-- Cannot reliably convert to Microsoft Fabric canonical DDL without:
-  1. Canonical table/column mappings from Agent 4.
-  2. Fabric DDL standards covering target syntax, type mappings, naming conventions, schema conventions, and constraint handling.
-
-Required Next Inputs:
-- Agent 4 canonical mapping output.
-- Fabric model standards document.
+-- ERROR / VALIDATION REPORT
+-- Required inputs were found:
+--   * agent4 output.txt
+--   * Microsoft Fabric Model Standards.txt
+--
+-- Generation halted because reliable Fabric DDL cannot be produced without unresolved required decisions.
+--
+-- Missing / Ambiguous Requirements:
+-- 1. Fabric target is not confirmed.
+--    The standards explicitly state that the specific target (Fabric Warehouse or Lakehouse SQL analytics endpoint)
+--    must be confirmed before generating DDL, and that SQL Server syntax must not be assumed.
+--
+-- 2. Schema convention is not supplied.
+--    The standards require consistent schema usage, but no schema name was provided.
+--
+-- 3. Physical type mapping rules are incomplete.
+--    Agent 4 provides canonical types such as STRING, INTEGER, BOOLEAN, DECIMAL, DATE, and TIMESTAMP,
+--    but the standards do not define the required Microsoft Fabric physical SQL types for each canonical type,
+--    nor default string lengths where the canonical type is generic.
+--
+-- 4. Key definitions are not fully specified.
+--    The standards permit primary keys only when identified by the mapping or approved specification.
+--    Agent 4 does not consistently identify primary keys, composite keys, or uniqueness rules for all canonical tables.
+--
+-- 5. Foreign key / relationship enforcement is not fully specified.
+--    The standards permit foreign keys only when supported by the supplied mapping and target capabilities.
+--    Agent 4 implies many relationships but does not provide approved DDL-ready relationship specifications.
+--
+-- 6. Nullability is not defined.
+--    The standards state NULL / NOT NULL should be applied only when supported by source mapping or approved business rules.
+--    The mapping does not provide nullability.
+--
+-- 7. Multiple Agent 4 mapping remarks identify unresolved modeling ambiguities that affect reliable DDL design:
+--    * SCHOOL.AUTHORIZED_PROGRAMMES structural ambiguity.
+--    * COURSE.PROGRAMME_CODE may be descriptive only.
+--    * COURSE_SECTION / SECTION_OFFERING key ambiguity.
+--    * SECTION_TEACHER_ASSIGNMENT mixed-grain risk.
+--    * ATTENDANCE_EVENT event-grain uniqueness not explicitly enforced.
+--    * ENROLLMENT_ATTENDANCE_SUMMARY key derivation unresolved.
+--    * ASSESSMENT_RESULT repeated-result grain ambiguity.
+--
+-- As a result, no executable DDL is emitted to avoid fabricating unsupported target-specific syntax.
+--
+-- Recommended clarification needed before DDL generation:
+--   * Confirm Fabric target: Warehouse or Lakehouse SQL analytics endpoint.
+--   * Provide schema name.
+--   * Provide approved canonical-to-physical type mappings.
+--   * Provide approved primary keys and foreign keys.
+--   * Provide nullability rules.
+--
+-- Validation status:
+--   a. Inputs present: PASS
+--   b. All canonical tables and columns present in source mapping: SOURCE PRESENT
+--   c. Data types and naming conventions correct in final DDL: NOT VALIDATABLE
+--   d. Constraints and relationships per standards: NOT VALIDATABLE
+--   e. Output file created: PASS
